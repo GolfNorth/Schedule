@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" >
+    </head>
+    <body>
+        <div class="container">{REPLACE}</div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('img').each(function() {
+                    $(this).attr('src', $(this).attr('src').replace('/img/dinamic/', 'http://www.ishnk.ru/img/dinamic/'));
+                    $(this).parent().addClass('align-middle');
+                });
+                $('table').each(function() {
+                    $(this).wrap("<div class='table-responsive'></div>");
+                    $(this).addClass('table').addClass('table-bordered').addClass('table-striped');
+                });
+                $('thead').each(function() {
+                    $(this).addClass('thead-dark');
+                });
+                $('tr.blue').each(function() {
+                    $(this).find('td').each (function() {
+                        $(this).addClass('table-primary');
+                    });    
+                });
+                $('td.yellow').each(function() {
+                    $(this).addClass('table-warning');
+                });
+                $('td.center').each(function() {
+                    $(this).addClass('text-center').addClass('align-middle');
+                });
+                $('h3').each(function() {
+                    $(this).addClass('text-primary');
+                });
+                $('div.center.red').each(function() {
+                    $(this).addClass('alert').addClass('alert-danger');
+                });
+            });
+        </script>
+    </body>
+</html>
