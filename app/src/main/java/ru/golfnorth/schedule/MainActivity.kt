@@ -1,32 +1,23 @@
 package ru.golfnorth.schedule
 
+import android.app.DatePickerDialog
+import android.app.DatePickerDialog.OnDateSetListener
+import android.content.Context
+import android.content.SharedPreferences
+import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.webkit.WebView
-
-import kotlinx.android.synthetic.main.activity_main.*
-
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import java.io.*
+import java.net.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-
-import org.json.JSONObject
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.DefaultHttpClient
-import android.os.AsyncTask
-import java.net.URLEncoder
-import java.io.InputStream
-import android.app.DatePickerDialog.OnDateSetListener
-import android.app.DatePickerDialog
-import android.content.Context
-import android.content.SharedPreferences
-import android.view.View
-
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -35,8 +26,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var template: String
     private lateinit var sharedPref: SharedPreferences
 
-    private var teacherId: Int = 0 // ID учителя
-    private var tokenId: String = "ХХХХХХХХХХХХХХХХХХХХХХ" // Токен PhantomJSCloud
+    //private var teacherId: Int = 294 // ID учителя
+    //private var tokenId: String = "ak-dz65s-tw68x-49006-ajmqa-4ytpp" // Токен PhantomJSCloud
     private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        sharedPref = this?.getPreferences(Context.MODE_PRIVATE) ?: return
+        sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
 
         swipeRefreshLayout=findViewById(R.id.swipeRefresh)
         swipeRefreshLayout.setColorSchemeResources(R.color.blue, R.color.green, R.color.yellow, R.color.red)
@@ -102,12 +93,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadSchedule(calendar: Calendar) {
-        val onlyDate: String = dateFormat.format(calendar.time)
-
-        val url: String = "http://phantomjscloud.com/api/browser/v2/$tokenId/?request=" +
-                URLEncoder.encode("{url:\"http://www.ishnk.ru/staffs/schedule\",renderType:\"script\",requestSettings:{ignoreImages:true},scripts:{domReady:[\"\$.get('/save',{dateSched:'$onlyDate',academicYear:'$onlyDate%'},function(){\$.get('/schedule/teacher',{teacher:$teacherId},function(result){window._pjscMeta.scriptOutput={Result:result}})})\"]},outputAsJson:false}","UTF-8")
-
-        LoadJsonTask().execute(url)
+        LoadContentTask().execute(dateFormat.format(calendar.time), 294.toString())
     }
 
     private fun getScheduleCalendar(): Calendar {
@@ -162,21 +148,13 @@ class MainActivity : AppCompatActivity() {
         loadSchedule(scheduleCalendar)
     }
 
-    private inner class LoadJsonTask : AsyncTask<String, Void, String>() {
-        override fun doInBackground(vararg urls: String): String {
-            val httpClient = DefaultHttpClient()
-            val httpGet = HttpGet(urls[0])
-            val response = httpClient.execute(httpGet)
-            val entity = response.entity
-            val stream = entity.content
-            val reader = BufferedReader(InputStreamReader(stream, "utf-8"), 8)
+    private inner class LoadContentTask : AsyncTask<String, Void, String>() {
+        override fun doInBackground(vararg params: String): String {
+            CookieHandler.setDefault(CookieManager(null, CookiePolicy.ACCEPT_ALL))
 
-            val json: String = reader.readLine()
+            loadContent("http://www.ishnk.ru/save?dateSched=" + params[0] + "&academicYear=" + params[0])
 
-            stream.close()
-
-            val mainObject = JSONObject(json)
-            return mainObject.getString("Result")
+            return loadContent("http://www.ishnk.ru/schedule/teacher?teacher=" + params[1])
         }
 
         override fun onPreExecute() {
@@ -187,6 +165,28 @@ class MainActivity : AppCompatActivity() {
             this@MainActivity.showSchedule(result)
 
             swipeRefreshLayout.isRefreshing = false
+        }
+
+        private fun readStream(`is`: InputStream): String {
+            val sb = StringBuilder()
+            val r = BufferedReader(InputStreamReader(`is`), 1000)
+            var line = r.readLine()
+            while (line != null) {
+                sb.append(line)
+                line = r.readLine()
+            }
+            `is`.close()
+            return sb.toString()
+        }
+
+        private fun loadContent(url: String): String {
+            val urlConnection = URL(url).openConnection() as HttpURLConnection
+            try {
+                urlConnection.setRequestProperty("X-Requested-With", "XMLHttpRequest")
+                return readStream(BufferedInputStream(urlConnection.inputStream))
+            } finally {
+                urlConnection.disconnect()
+            }
         }
     }
 }
