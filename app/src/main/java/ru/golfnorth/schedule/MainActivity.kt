@@ -26,8 +26,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var template: String
     private lateinit var sharedPref: SharedPreferences
 
-    //private var teacherId: Int = 294 // ID учителя
-    //private var tokenId: String = "ak-dz65s-tw68x-49006-ajmqa-4ytpp" // Токен PhantomJSCloud
     private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
     override fun onCreate(savedInstanceState: Bundle?) {
