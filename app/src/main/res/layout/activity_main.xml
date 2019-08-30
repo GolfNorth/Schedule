@@ -11,24 +11,75 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:minHeight="?actionBarSize"
+            android:padding="@dimen/appbar_padding"
+            android:text="@string/app_name"
+            android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="wrap_content"
+            app:tabIconTint="@android:color/white">
+            <android.support.design.widget.TabItem
+                android:icon="@drawable/ic_people"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>/>
+            <android.support.design.widget.TabItem
+                android:icon="@drawable/ic_person"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>/>
+            <android.support.design.widget.TabItem
+                android:icon="@drawable/ic_notifications"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>/>
+
+        </android.support.design.widget.TabLayout>
 
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:onClick="setDate"
-        app:srcCompat="@drawable/baseline_calendar_today" />
+        fab:menu_colorNormal="#DA4336"
+        android:layout_margin="@dimen/fab_margin">
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:onClick="setDate"
+            android:src="@drawable/baseline_calendar_today"
+            app:fab_label="@string/action_date" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/teacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="setDate"
+            android:src="@drawable/ic_person"
+            app:fab_label="@string/action_teacher" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="setDate"
+            android:src="@drawable/ic_people"
+            app:fab_label="@string/action_group"/>
+    </com.github.clans.fab.FloatingActionMenu>
 
 </android.support.design.widget.CoordinatorLayout>
