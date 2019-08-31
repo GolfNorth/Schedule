@@ -21,65 +21,53 @@
             android:text="@string/app_name"
             android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabIconTint="@android:color/white">
-            <android.support.design.widget.TabItem
-                android:icon="@drawable/ic_people"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"/>/>
-            <android.support.design.widget.TabItem
-                android:icon="@drawable/ic_person"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"/>/>
-            <android.support.design.widget.TabItem
-                android:icon="@drawable/ic_notifications"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"/>/>
-
-        </android.support.design.widget.TabLayout>
-
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />
 
     <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/menu"
+        android:id="@+id/fabMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        fab:menu_colorNormal="#DA4336"
-        android:layout_margin="@dimen/fab_margin">
+        android:layout_margin="@dimen/fab_margin"
+        app:menu_colorNormal="@color/colorAccent" >
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/date"
+            android:id="@+id/fabCall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp"
-            android:onClick="setDate"
-            android:src="@drawable/baseline_calendar_today"
-            app:fab_label="@string/action_date" />
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/teacher"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
             android:layout_margin="@dimen/fab_margin"
-            android:onClick="setDate"
+            android:onClick="loadCallSchedule"
+            android:src="@drawable/ic_notifications"
+            app:fab_label="@string/action_call"
+            app:fab_colorNormal="@color/colorAccent" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabTeacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="setTeacher"
             android:src="@drawable/ic_person"
+            app:fab_colorNormal="@color/colorAccent"
             app:fab_label="@string/action_teacher" />
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/group"
+            android:id="@+id/fabGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="setGroup"
+            android:src="@drawable/ic_people"
+            app:fab_colorNormal="@color/colorAccent"
+            app:fab_label="@string/action_group"/>
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:onClick="setDate"
-            android:src="@drawable/ic_people"
-            app:fab_label="@string/action_group"/>
+            android:src="@drawable/baseline_calendar_today"
+            app:fab_colorNormal="@color/colorAccent"
+            app:fab_label="@string/action_date" />
     </com.github.clans.fab.FloatingActionMenu>
 
 </android.support.design.widget.CoordinatorLayout>

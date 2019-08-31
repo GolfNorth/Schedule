@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Расписание</string>
-    <string name="action_teacher">Преподаватель</string>
-    <string name="action_group">Группа</string>
-    <string name="action_call">Звонок</string>
-    <string name="action_refresh">Обновить</string>
-    <string name="action_settings">Настройки</string>
-    <string name="action_date">Дата</string>
+    <string name="action_teacher">Расписание преподавателя</string>
+    <string name="action_group">Расписание группы</string>
+    <string name="action_call">Расписание звонков</string>
+    <string name="action_date">Выбрать дату</string>
+    <string name="select_teacher">Выберите преподавателя</string>
+    <string name="select_group">Выберите группу</string>
 </resources>
