@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Schedule</string>
     <string name="action_teacher">Teacher</string>
-    <string name="action_refresh">Refresh</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_group">Group</string>
+    <string name="action_call">Call</string>
+    <string name="action_date">Date</string>
+    <string name="select_teacher">Select Teacher</string>
+    <string name="select_group">Select Group</string>
 </resources>

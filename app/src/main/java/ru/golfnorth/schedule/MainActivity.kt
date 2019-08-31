@@ -8,30 +8,38 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
+import org.jsoup.Jsoup
 import java.io.*
 import java.net.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.android.synthetic.main.activity_main.*
+import android.app.AlertDialog
+import android.content.DialogInterface
+import android.util.Log
+import android.widget.TextView
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var webView: WebView
+    private lateinit var textView: TextView
     private lateinit var scheduleCalendar: Calendar
+    private lateinit var scheduleMode: String
+    private lateinit var scheduleTitle: String
     private lateinit var template: String
+    private lateinit var dialogTitle: String
     private lateinit var sharedPref: SharedPreferences
+    private var scheduleId: Int = 0
 
     private val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
 
         sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
 
@@ -39,33 +47,22 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.setColorSchemeResources(R.color.blue, R.color.green, R.color.yellow, R.color.red)
         swipeRefreshLayout.setOnRefreshListener { handleRefresh() }
 
+        textView = findViewById(R.id.title)
+
         webView = findViewById(R.id.webView)
         webView.settings.javaScriptEnabled = true
 
         scheduleCalendar = getScheduleCalendar()
+        scheduleMode = sharedPref.getString("lastMode", "Group")
+        scheduleId = sharedPref.getInt("lastId", 0)
+        scheduleTitle = sharedPref.getString("lastTitle", getString(R.string.action_group))
         template = ""
 
-        loadSchedule(scheduleCalendar)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
+        loadSchedule()
     }
 
     private fun handleRefresh () {
-        loadSchedule(scheduleCalendar)
+        loadSchedule()
     }
 
     private fun showSchedule (content: String) {
@@ -90,8 +87,25 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.isRefreshing = false
     }
 
-    private fun loadSchedule(calendar: Calendar) {
-        LoadContentTask().execute(dateFormat.format(calendar.time), 294.toString())
+    private fun loadSchedule() {
+        if (scheduleId > 0){
+            when (scheduleMode) {
+                "Group" -> LoadContentTask().execute(dateFormat.format(scheduleCalendar.time), "http://www.ishnk.ru/schedule/group?group=" + scheduleId.toString())
+                "Teacher" -> LoadContentTask().execute(dateFormat.format(scheduleCalendar.time), "http://www.ishnk.ru/schedule/teacher?teacher=" + scheduleId.toString())
+                "Call" -> LoadContentTask().execute(dateFormat.format(scheduleCalendar.time), "http://www.ishnk.ru/schedule/calls?type=all")
+            }
+
+            textView.text = scheduleTitle
+
+            with (sharedPref.edit()) {
+                putString("lastMode", scheduleMode)
+                putString("lastTitle", scheduleTitle)
+                putInt("lastId", scheduleId)
+                commit()
+            }
+        } else {
+            setGroup(fabGroup)
+        }
     }
 
     private fun getScheduleCalendar(): Calendar {
@@ -127,10 +141,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun setDate (v: View) {
+    public fun setDate (v: View) {
         var datePicker = DatePickerDialog(v.context, datePickerCallBack, scheduleCalendar.get(Calendar.YEAR), scheduleCalendar.get(Calendar.MONTH), scheduleCalendar.get(Calendar.DAY_OF_MONTH))
 
         datePicker.show()
+        fabMenu.close(true)
+    }
+
+    public fun setTeacher (v: View) {
+        dialogTitle = getString(R.string.select_teacher)
+        scheduleMode = "Teacher"
+
+        LoadItemsTask().execute("http://www.ishnk.ru/teachers")
+
+        fabMenu.close(true)
+    }
+
+    public fun setGroup (v: View) {
+        dialogTitle = getString(R.string.select_group)
+        scheduleMode = "Group"
+
+        LoadItemsTask().execute("http://www.ishnk.ru/groups")
+
+        fabMenu.close(true)
+    }
+
+    public fun loadCallSchedule (v: View) {
+        scheduleMode = "Call"
+        scheduleTitle = getString(R.string.action_call)
+
+        loadSchedule()
+
+        fabMenu.close(true)
     }
 
     private var datePickerCallBack: OnDateSetListener = OnDateSetListener { _, year, month, dayOfMonth ->
@@ -143,7 +185,7 @@ class MainActivity : AppCompatActivity() {
             commit()
         }
 
-        loadSchedule(scheduleCalendar)
+        loadSchedule()
     }
 
     private inner class LoadContentTask : AsyncTask<String, Void, String>() {
@@ -152,7 +194,7 @@ class MainActivity : AppCompatActivity() {
 
             loadContent("http://www.ishnk.ru/save?dateSched=" + params[0] + "&academicYear=" + params[0])
 
-            return loadContent("http://www.ishnk.ru/schedule/teacher?teacher=" + params[1])
+            return loadContent(params[1])
         }
 
         override fun onPreExecute() {
@@ -161,6 +203,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onPostExecute(result: String) {
             this@MainActivity.showSchedule(result)
+            println(5)
 
             swipeRefreshLayout.isRefreshing = false
         }
@@ -185,6 +228,48 @@ class MainActivity : AppCompatActivity() {
             } finally {
                 urlConnection.disconnect()
             }
+        }
+    }
+
+    private inner class LoadItemsTask : AsyncTask<String, Void, MutableMap<String, Int>>() {
+        override fun doInBackground(vararg params: String): MutableMap<String, Int> {
+            val doc = Jsoup.connect(params[0]).header("X-Requested-With", "XMLHttpRequest").get()
+
+            val mapItems = mutableMapOf<String, Int>()
+
+            val tdElementIterator = doc.select("td").listIterator()
+
+            while (tdElementIterator.hasNext()) {
+                val element = tdElementIterator.next()
+
+                if (element.attr("data-id") != "") {
+                    mapItems.put(element.text(), element.attr("data-id").toInt())
+                }
+            }
+
+            return mapItems
+        }
+
+        override fun onPreExecute() {
+            swipeRefreshLayout.isRefreshing = true
+        }
+
+        override fun onPostExecute(result: MutableMap<String, Int>) {
+            val dialogBuilder = AlertDialog.Builder(this@MainActivity)
+            val sorted = result.toSortedMap().keys.toTypedArray()
+
+            dialogBuilder.setTitle(dialogTitle)
+                    .setCancelable(true)
+                    .setItems(sorted, DialogInterface.OnClickListener { _, which ->
+                        scheduleId = result.get(sorted[which])!!.toInt()
+                        scheduleTitle = sorted[which]
+
+                        loadSchedule()
+                    })
+                    .create()
+                    .show()
+
+            swipeRefreshLayout.isRefreshing = false
         }
     }
 }
