@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:onClick="setTeacher"
+            android:onClick="setTeacherOrGroup"
             android:src="@drawable/ic_person"
             app:fab_colorNormal="@color/colorAccent"
             app:fab_label="@string/action_teacher" />
@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:onClick="setGroup"
+            android:onClick="setTeacherOrGroup"
             android:src="@drawable/ic_people"
             app:fab_colorNormal="@color/colorAccent"
             app:fab_label="@string/action_group"/>

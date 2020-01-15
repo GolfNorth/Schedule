@@ -6,4 +6,6 @@
     <string name="action_date">Выбрать дату</string>
     <string name="select_teacher">Выберите преподавателя</string>
     <string name="select_group">Выберите группу</string>
+    <string name="channel_name">Новое расписание</string>
+    <string name="notification_text">Доступно новое расписание</string>
 </resources>

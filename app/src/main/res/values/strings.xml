@@ -6,4 +6,6 @@
     <string name="action_date">Date</string>
     <string name="select_teacher">Select Teacher</string>
     <string name="select_group">Select Group</string>
+    <string name="channel_name">New schedule</string>
+    <string name="notification_text">You have a new schedule</string>
 </resources>
